@@ -8,8 +8,13 @@ def dictionary(searchterm)
         message1 = client.search(searchterm)
         messages = message1.to_hash
         messages = messages[:entries].first
-        puts messages
-        message = "#{messages[:id_attribute]} , Pronunciation: #{messages[:pronunciation]} , Part of speech : #{messages[:part_of_speech]}\n"
+        message = "#{messages[:id_attribute]} , Pronunciation: #{messages[:pronunciation]} , Part of speech : #{messages[:part_of_speech]}\nDefinitions: \n"
+        messages[:definitions].each do |definition|
+            message = message+ "\n#{definition[:sense_number]}#{definition[:text]}"
+            if definition[:verbal_illustration]
+                message = message + ",Illustration:#{definition[:verbal_ilustration]}"
+            end
+        end
     rescue
         message = "I couldn't find the word mudhalaali."
         puts "Error"
