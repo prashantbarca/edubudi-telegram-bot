@@ -12,11 +12,11 @@ def dictionary(searchterm)
         messages[:definitions].each do |definition|
             message = message+ "\n#{definition[:sense_number]}#{definition[:text]}"
             if definition[:verbal_illustration]
-                message = message + ",Illustration:#{definition[:verbal_ilustration]}"
+                message = message + ", Illustration:#{definition[:verbal_illustration]}"
             end
         end
     rescue
-        message = "I couldn't find the word mudhalaali."
+        message = "I couldn't find the word, mudhalaali."
         puts "Error"
     end
     return message
