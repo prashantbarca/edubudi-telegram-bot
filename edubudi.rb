@@ -23,18 +23,15 @@ def dictionary(searchterm)
 end
 def twitterupdate(status)
     if status.include?(ENV['EDUBUDI_PASSWORD'])
-       status = status.gsub(ENV['EDUBUDI_PASSWORD'],"")
-       `sh twitter.sh #{status}`
+        status = status.gsub(ENV['EDUBUDI_PASSWORD'],"")
+        `sh twitter.sh #{status}`
         return "Successfully updated status."
     else
         return "Status couldn't be updated. Type Help for syntaxes."
     end
 end
+offset = 0
 while 1
-    offset = ""
-    File.open "offset","r" do |a|
-        offset = offset+ a.read
-    end
     response = RestClient.get "https://api.telegram.org/#{ENV['EDUBUDI_API']}/getUpdates", {:params => {"offset" => offset.to_i+1}}
     updates = JSON.parse(response)["result"]
     updates.each do |update|
@@ -61,9 +58,7 @@ while 1
                 xyz= RestClient.get "https://api.telegram.org/#{ENV['EDUBUDI_API']}/sendMessage" ,{:params => {"chat_id"=> update["message"]["chat"]["id"], "text"=> message}}
             end
             if update["update_id"].to_i>offset.to_i
-                File.open "offset","w" do |file|
-                    file.write update["update_id"]
-                end
+                offset = update["update_id"].to_i
             end
         end
     end
