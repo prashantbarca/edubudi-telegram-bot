@@ -1,6 +1,58 @@
+
 require 'mw_dictionary_api'
 require 'rest_client'
+require 'json'
+require 'date'
 
+########################################################################################################
+#                                                                                                      #
+#           TODO: Get general weather data and format it as if edubudi is talking to user              #
+#                                                                                                      #
+########################################################################################################
+
+def forecast(city)
+    response = RestClient.get "http://api.openweathermap.org/data/2.5/forecast?q=#{city}&units=metric"
+    response_hash = JSON.parse response
+    status = response_hash.empty?
+    status = !status
+    if status
+        list = response_hash["list"]
+        message = "City: #{response_hash["city"]["name"]}\n"
+        list.each do |str|
+            str_date = str["dt_txt"]#.split(" ")
+            #date = str_date[0]
+            #time = str_date[1]
+            message += "Date: #{str_date}\n" 
+            message += "Temp: #{str["main"]["temp"]}\n"
+            message += "Max Temp: #{str["main"]["temp_max"]}\n"
+            message += "Min Temp: #{str["main"]["temp_min"]}\n"
+        end
+    else
+        message = "Sorry your request could not be processed please try again\n"
+    end
+    puts message
+    message
+end
+
+def weathertoday(city)
+    response = RestClient.get "http://api.openweathermap.org/data/2.5/weather?q=#{city}&units=metric"
+    response_hash = JSON.parse response
+    status = response_hash.empty?
+    status = !status
+    if status
+        temp = response_hash["main"]["temp"]
+        temp_min = response_hash["main"]["temp_min"]
+        temp_max = response_hash["main"]["temp_max"]     
+        message = "City: #{response_hash["name"]}\n"
+        message+= "Temp: #{response_hash["main"]["temp"]}\n"
+        message+= "Max Temp: #{response_hash["main"]["temp_max"]}\n"
+        message+= "Min Temp: #{response_hash["main"]["temp_min"]}"
+    else
+        message = "Sorry your request could not be processed please try again\n"
+    end
+    puts message
+    message
+end
 
 def dictionary(searchterm)
     client = MWDictionaryAPI::Client.new(ENV['MERIAM_API'], api_type: "collegiate")
@@ -21,6 +73,7 @@ def dictionary(searchterm)
     end
     return message
 end
+
 def twitterupdate(status)
     if status.include?(ENV['EDUBUDI_PASSWORD'])
        status = status.gsub(ENV['EDUBUDI_PASSWORD'],"")
@@ -30,6 +83,7 @@ def twitterupdate(status)
         return "Status couldn't be updated. Type Help for syntaxes."
     end
 end
+
 while 1
     offset = ""
     File.open "offset","r" do |a|
@@ -45,12 +99,17 @@ while 1
             #
             #
             #
-            if fir[0]=="dictionary" or fir[0]=="Dictionary"
+            command = fir[0].downcase
+            if command=="dictionary" 
                 message = dictionary(fir[1])
-            elsif fir[0]=="twitter" or fir[0]=="Twitter"
+            elsif command=="twitter" 
                 message = twitterupdate(update["message"]["text"].gsub("@EdubudiBot","").gsub("@edubudibot","").gsub("@Edubudibot","").gsub("Twitter","").gsub("twitter",""))
+            elsif command=="weather" 
+                message = weather(fir[1])
+            elsif command=="forecast" 
+                message = forecast(fir[1])
             else
-                message = "Mudhalaali, I take only the following commands. \n ---------- \n Dictionary : 'Dictionary word' \n Twitter : 'Twitter edubudipassword statusupdate'"
+                message = "Mudhalaali, I take only the following commands. \n ---------- \n Dictionary : 'Dictionary word' \n Twitter : 'Twitter edubudipassword statusupdate' \n Weather : 'Weather cityname' \n 3 day Forecast : 'Forecast cityname'"
             end
             #
             # API appending part has ended!! 
