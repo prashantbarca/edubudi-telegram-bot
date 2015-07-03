@@ -103,7 +103,7 @@ while 1
             elsif command=="twitter" 
                 message = twitterupdate(update["message"]["text"].gsub("@EdubudiBot","").gsub("@edubudibot","").gsub("@Edubudibot","").gsub("Twitter","").gsub("twitter",""))
             elsif command=="weather" 
-                message = weather(fir[1])
+                message = weathertoday(fir[1])
             elsif command=="forecast" 
                 message = forecast(fir[1])
             else
