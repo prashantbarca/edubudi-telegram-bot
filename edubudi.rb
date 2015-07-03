@@ -12,6 +12,9 @@ require 'date'
 
 def forecast(city)
     response = RestClient.get "http://api.openweathermap.org/data/2.5/forecast?q=#{city}&units=metric"
+    if !city
+        return
+    end
     response_hash = JSON.parse response
     status = response_hash.empty?
     status = !status
@@ -36,6 +39,9 @@ end
 
 def weathertoday(city)
     response = RestClient.get "http://api.openweathermap.org/data/2.5/weather?q=#{city}&units=metric"
+    if !city
+        return 
+    end
     response_hash = JSON.parse response
     status = response_hash.empty?
     status = !status
