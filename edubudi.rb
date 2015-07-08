@@ -97,7 +97,11 @@ while 1
     updates = JSON.parse(response)["result"]
     updates.each do |update|
         begin
+            if update["message"]["text"]
             fir = update["message"]["text"].gsub("@EdubudiBot","").gsub("@edubudibot","").gsub("@Edubudibot","").split(" ")
+            else
+                fir = "random".split(' ')
+            end
             # 
             # Here is where we add our api
             #
@@ -126,6 +130,8 @@ while 1
             if update["update_id"].to_i>offset.to_i
                 offset = update["update_id"].to_i
             end
+        rescue
+            puts "err"
         end
     end
     sleep 1
